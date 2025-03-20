@@ -1,0 +1,57 @@
+GET http://localhost:3000/
+###
+
+POST http://localhost:3000/login HTTP/1.1 
+content-type: application/json
+Authorization: Basic MToxMjM0NTY=
+
+{
+
+}
+
+###
+POST http://localhost:3000/singup HTTP/1.1 
+content-type: application/json
+Authorization: Basic MToxMjM0NTY=
+
+{
+    "name": "Pedro",
+    "email": "pedro@gmail.com",
+    "username": "Pedro Henrique",
+    "password": "123456"
+}
+###
+POST http://localhost:3000/submit HTTP/1.1 
+content-type: application/json
+
+{
+"title": "Cavalo"
+}
+###
+POST http://localhost:3000/1 HTTP/1.1 
+Content-Type: application/x-www-form-urlencoded;
+
+
+###
+PATCH  http://localhost:3000/update/1/image  HTTP/1.1
+Accept: application/json
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="teste.txt"
+Content-Type: text/plain
+
+< .\api\teste.txt
+--MyBoundary
+Content-Disposition: form-data; name="ProspectId"
+
+1
+--MyBoundary--
+
+###
+PUT http://localhost:3000/update/1  HTTP/1.1
+content-type: application/json
+
+{
+  "title": "New Title"
+}
