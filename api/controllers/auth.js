@@ -108,14 +108,7 @@
         if (!name || !email || !username || !password) {
             return res.status(400).send({ error: "All fields are required" });
         }
-    
-        const client = new Client({
-            user: 'postgres',
-            password: 'postgres',
-            host: 'localhost',
-            port: 5432,
-            database: 'postgres',
-        });
+
 }
 
     function register(req, res){
