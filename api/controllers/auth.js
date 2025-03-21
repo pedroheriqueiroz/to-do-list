@@ -5,6 +5,7 @@
     const pg = require('pg') 
     const { Client } = pg
 
+    // estou apenas fazendo um teste para saber se vai dar certo o commit
 
     const ajv = new Ajv({ allErrors: true })
     
@@ -108,7 +109,14 @@
         if (!name || !email || !username || !password) {
             return res.status(400).send({ error: "All fields are required" });
         }
-
+    
+        const client = new Client({
+            user: 'postgres',
+            password: 'postgres',
+            host: 'localhost',
+            port: 5432,
+            database: 'postgres',
+        });
 }
 
     function register(req, res){
