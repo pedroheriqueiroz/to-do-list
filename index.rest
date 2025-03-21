@@ -15,10 +15,10 @@ content-type: application/json
 Authorization: Basic MToxMjM0NTY=
 
 {
-    "name": "Pedro",
-    "email": "pedro@gmail.com",
-    "username": "Pedro Henrique",
-    "password": "123456"
+    "name": "Fellipe",
+    "email": "fellipe@outlook.com",
+    "username": "Felipe Sales",
+    "password": "456789"
 }
 ###
 POST http://localhost:3000/submit HTTP/1.1 

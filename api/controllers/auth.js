@@ -54,6 +54,16 @@
         }
     
         try {
+            console.log("cliente")
+
+            const client = new Client({
+                user: 'postgres',
+                password: 'postgres',
+                host: 'localhost',
+                port: 5432,
+                database: 'postgres',
+            });
+            
             await client.connect();
     
             // Verifica se o usuário já existe
@@ -68,7 +78,7 @@
             }
     
             // Insere o novo usuário
-            const query = 'INSERT INTO users(username, email, password, name) VALUES($1, $2, $3, $4) RETURNING *';
+            const query = 'INSERT INTO users(username, email, password, name) VALUES($1, $2, $3, $4) RETURNING username, email, name, id';
             const values = [username, email, password, name];
     
             const result = await client.query(query, values);
@@ -97,10 +107,6 @@
     async function updateController(req, res) {
 
         const { name, email, username, password } = req.body;
-    
-        if (!name || !email || !username || !password) {
-            return res.status(400).send({ error: "All fields are required" });
-        }
     
         const client = new Client({
             user: 'postgres',
