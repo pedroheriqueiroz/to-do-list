@@ -21,6 +21,15 @@ Authorization: Basic MToxMjM0NTY=
     "password": "456789"
 }
 ###
+POST http://localhost:3000/updatepassword/6 HTTP/1.1 
+content-type: application/json
+Authorization: Basic MToxMjM0NTY=
+
+{
+    "oldPassword": "newPassword",
+    "newPassword": "12345678"
+}
+###
 POST http://localhost:3000/submit HTTP/1.1 
 content-type: application/json
 

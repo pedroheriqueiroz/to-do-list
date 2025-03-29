@@ -4,6 +4,7 @@
     const Ajv = require('ajv')
     const pg = require('pg') 
     const { Client } = pg
+    const bcrypt = require('bcryptjs')
 
     // estou apenas fazendo um teste para saber se vai dar certo o commit
 
@@ -104,18 +105,58 @@
         .prop('title', S.string().minLength(3).required())
         .prop('description', S.string().minLength(5).maxLength(150).required())
 
-    async function updateController(req, res) {
+        async function passwordController(req, res) {
+            const { oldPassword, newPassword } = req.body;
+            const userId = parseInt(req.params.id, 10);
+        
+            if (isNaN(userId)) {
+                return res.status(400).send({ error: "Invalid user ID" });
+            }
+            if (!oldPassword || !newPassword) {
+                return res.status(400).send({ error: "The passwords are required" });
+            }
+        
+            const client = new Client({
+                user: 'postgres',
+                password: 'postgres',
+                host: 'localhost',
+                port: 5432,
+                database: 'postgres',
+            });
+        
+            try {
+                await client.connect();
+        
+                // Buscar senha atual no banco
+                const result = await client.query(
+                    'SELECT password FROM users WHERE id = $1',
+                    [userId]
+                );
+        
+                if (result.rows.length === 0) {
+                    return res.status(400).send({ error: "User not found!" });
+                }
+        
+                const user = result.rows[0];
+        
+                // Verificar se a senha antiga está correta
+                if (oldPassword !== user.password) {
+                    return res.status(400).send({ error: "Incorrect old password!" });
+                }
+                
+                // Atualizar senha no banco
+                await client.query('UPDATE users SET password = $1 WHERE id = $2', [newPassword, userId]);
 
-        const { name, email, username, password } = req.body;
-    
-        const client = new Client({
-            user: 'postgres',
-            password: 'postgres',
-            host: 'localhost',
-            port: 5432,
-            database: 'postgres',
-        });
-}
+                return res.send({ message: 'Password updated sucesfully!' });
+        
+            } catch (error) {
+                console.error(error);
+                return res.status(500).send({ error: 'Erro no servidor' });
+            } finally {
+                await client.end();
+            }
+        }
+        
 
     function register(req, res){
         const {body} = req
@@ -127,5 +168,6 @@
     module.exports = function(fastify, opts, done){
         fastify.post('/login', {schema: userSchema}, loginController)
         fastify.post('/singup', signupController);
+        fastify.post('/updatepassword/:id', {schema: userSchema}, passwordController)
         done();
     }
