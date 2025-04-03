@@ -24,15 +24,6 @@ fastify.get('/', function (request, response) {
   response.send({ hello: 'world' })
 })
 
-
-fastify.post('/submit', { schema: { body: noteSchema } }, async (request, response) => {
-    const {title, description} = request.body;
-    console.log('title', title)
-    console.log('description', description)
-    response.status(201).send({sucess: "informations passed withs sucess"})
-    console.log()
-});
-
 const schemaId = {
     params: S.object()
         .prop('id', S.integer().minimum(1).required()),

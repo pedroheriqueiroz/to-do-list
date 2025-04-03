@@ -134,14 +134,14 @@
                 );
         
                 if (result.rows.length === 0) {
-                    return res.status(400).send({ error: "User not found!" });
+                    return res.status(404).send({ error: "User not found!" });
                 }
         
                 const user = result.rows[0];
         
                 // Verificar se a senha antiga está correta
                 if (oldPassword !== user.password) {
-                    return res.status(400).send({ error: "Incorrect old password!" });
+                    return res.status(401).send({ error: "Incorrect old password!" });
                 }
                 
                 // Atualizar senha no banco
@@ -152,6 +152,80 @@
             } catch (error) {
                 console.error(error);
                 return res.status(500).send({ error: 'Erro no servidor' });
+            } finally {
+                console.log("finally")
+                await client.end();
+            }
+        }
+
+        async function submitTaskController(req, res) { // perguntar a relação das tabelas com os users
+
+            const { title, description } = req.body;
+
+            if (!title || !description) {
+                return res.status(400).json({ error: "Title and description are required" });
+            }
+
+            const client = new Client({
+                user: 'postgres',
+                password: 'postgres',
+                host: 'localhost',
+                port: 5432,
+                database: 'postgres',
+            });
+
+            try {
+        
+                await client.connect();
+        
+                // Insere os dados na tabela `tasks`
+                await client.query(
+                    "INSERT INTO tasks (title, description) VALUES ($1, $2)",
+                    [title, description]
+                );
+        
+                res.status(201).send({ success: "Task created successfully" });
+            } catch (error) {
+                console.error("Database error:", error);
+                res.status(500).send({ error: "Internal Server Error" });
+            } finally {
+                console.log("finally")
+                await client.end();
+            }
+        }
+
+        async function deleteTaskController(req, res) {
+            const { id } = req.params; // O ID da tarefa vem da URL
+        
+            if (!id) {
+                return res.status(400).send({ error: "Task ID is required" });
+            }
+        
+            const client = new Client({
+                user: "postgres",
+                password: "postgres",
+                host: "localhost",
+                port: 5432,
+                database: "postgres",
+            });
+        
+            try {
+                await client.connect();
+        
+                // Verifica se a tarefa existe antes de excluir
+                const result = await client.query("SELECT * FROM tasks WHERE id = $1", [id]);
+        
+                if (result.rows.length === 0) {
+                    return res.status(404).send({ error: "Task not found" });
+                }
+        
+                // Exclui a tarefa pelo ID
+                await client.query("DELETE FROM tasks WHERE id = $1", [id]);
+        
+                res.status(200).send({ success: "Task deleted successfully" });
+            } catch (error) {
+                console.error("Database error:", error);
+                res.status(500).send({ error: "Internal Server Error" });
             } finally {
                 await client.end();
             }
@@ -166,8 +240,10 @@
 
     
     module.exports = function(fastify, opts, done){
-        fastify.post('/login', {schema: userSchema}, loginController)
+        fastify.post('/login', {schema: userSchema}, loginController);
         fastify.post('/singup', signupController);
-        fastify.post('/updatepassword/:id', {schema: userSchema}, passwordController)
+        fastify.post('/updatepassword/:id', {schema: userSchema}, passwordController);
+        fastify.post('/submittask', {schema: noteSchema}, submitTaskController);
+        fastify.post('/delettask/:id', {schema: noteSchema}, deleteTaskController);
         done();
     }
