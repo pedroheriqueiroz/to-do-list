@@ -5,6 +5,7 @@ fastify.register(require('@fastify/multipart'))
 const S = require('fluent-json-schema')
 const path = require('path');
 const Ajv = require('ajv')
+const fs = require('fs');
 
 const auth = require('./controllers/auth')
 

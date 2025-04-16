@@ -231,6 +231,42 @@
             }
         }
         
+        async function imgController(request, response) {
+            const { id } = request.params;
+            const data = await request.file();
+        
+            if (!id) {
+                return response.status(400).send({ error: "An image is required" });
+            }
+        
+            const client = new Client({
+                user: "postgres",
+                password: "postgres",
+                host: "localhost",
+                port: 5432,
+                database: "postgres",
+            });
+        
+            try {
+                const uploadDir = path.join(__dirname, 'uploads');
+                const filePath = path.join(uploadDir, data.filename);
+        
+                if (!fs.existsSync(uploadDir)) {
+                    fs.mkdirSync(uploadDir);
+                }
+        
+                fs.writeFileSync(filePath, await data.toBuffer());
+        
+                return response.status(200).send({ message: "Image uploaded successfully", path: filePath });
+        
+            } catch (error) {
+                console.error("Database error:", error);
+                return response.status(500).send({ error: "Internal Server Error" });
+            } finally {
+                await client.end();
+            }
+        }        
+        
 
     function register(req, res){
         const {body} = req
@@ -245,5 +281,6 @@
         fastify.post('/updatepassword/:id', {schema: userSchema}, passwordController);
         fastify.post('/submittask', {schema: noteSchema}, submitTaskController);
         fastify.post('/delettask/:id', {schema: noteSchema}, deleteTaskController);
+        fastify.post('/update/:id/image', imgController);
         done();
     }

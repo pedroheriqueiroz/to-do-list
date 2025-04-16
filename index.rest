@@ -34,12 +34,12 @@ POST http://localhost:3000/submittask HTTP/1.1
 content-type: application/json
 
 {
-"title": "Observações",
-"description": "Apenas um teste para saber se o endpoint está funcionando!"
+"title": "Vendas",
+"description": "Segundo teste para ver se continua funcionando!"
 }
 
 ###
-POST http://localhost:3000/delettask/2 HTTP/1.1 
+POST http://localhost:3000/delettask/3 HTTP/1.1 
 
 ###
 POST http://localhost:3000/1 HTTP/1.1 
